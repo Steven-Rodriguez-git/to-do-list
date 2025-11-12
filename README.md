@@ -1,63 +1,179 @@
-Prueba Técnica Full Stack – To-Do List
-## .NET 9 (Backend) + Angular 17 (Frontend)
+# To-Do List – Prueba Técnica (.NET 9 + Angular 17)
 
-Este repositorio contiene la solución completa para la prueba técnica Full Stack de gestión de tareas (To-Do List), implementando autenticación y persistencia temporal.
+## 1. Objetivo
 
----
-
-## Objetivo del Proyecto
-
-El propósito de este ejercicio es demostrar la capacidad de desarrollar una aplicación moderna, evaluando aspectos clave como:
-
-* Organización y modularización del código.
-* Buenas prácticas de desarrollo (patrones de diseño y separación de responsabilidades).
-* Manejo de estado y comunicación eficiente entre cliente y servidor.
-* Implementación de seguridad (JWT Authentication).
-* Cobertura básica de pruebas unitarias en ambos stacks.
+Desarrollar una aplicación **To-Do List** que permita la gestión de tareas con autenticación JWT, implementando buenas prácticas tanto en el backend (.NET 9) como en el frontend (Angular 17).
 
 ---
 
-## Arquitectura General
+## 2. Arquitectura general
 
-El sistema está diseñado como un conjunto de dos aplicaciones separadas (Monorepo Lógico) para facilitar el desarrollo y la futura escalabilidad:
+El proyecto está compuesto por:
 
-| Componente | Stack Tecnológico | Descripción |
-| :--- | :--- | :--- |
-| **Backend** | **ASP.NET Core 9** (Web API) | Servidor API RESTful con autenticación JWT y persistencia temporal (EF Core InMemory). |
-| **Frontend** | **Angular 17** (Standalone) | Aplicación Single Page Application (SPA) con Angular Material, Lazy Loading y manejo de estado basado en Observables. |
+- **Backend:** ASP.NET Core 9 con Entity Framework Core (InMemory), autenticación JWT, validación de modelos y documentación con Swagger.  
+- **Frontend:** Angular 17 con componentes Standalone, Angular Material, interceptores JWT, manejo de estado con observables y lazy loading.
 
-### Diagrama Lógico
-
-Tecnologías PrincipalesBackend (todo-app/backend)TecnologíaDescripción.NET 9ASP.NET Core Web API para servicios REST.Entity Framework CoreUtilizado con la base de datos InMemory para persistencia temporal.JWTImplementación de Json Web Token para el control de acceso y autenticación.xUnitFramework de pruebas unitarias.Frontend (todo-app/frontend/todo-front)TecnologíaDescripciónAngular 17Uso de Standalone Components y arquitectura moderna de Angular.Angular MaterialComponentes y diseño para una interfaz limpia y responsiva.RxJS / ObservablesManejo de estado centralizado a través de servicios reactivos.GuardsProtección de rutas.Estructura del Proyectotodo-app/
+todo-app/
 ├── backend/
-│   ├── backend.sln
-│   ├── TodoApp.Api/             # Proyecto principal de la API .NET 9
-│   └── TodoApp.Tests/           # Proyecto de pruebas unitarias (xUnit)
+│ ├── backend.sln
+│ ├── TodoApp.Api/
+│ └── TodoApp.Tests/
 └── frontend/
-    └── todo-front/              # Proyecto Angular 17
-Instalación y Ejecución1. Backend (.NET 9)El backend utiliza una base de datos en memoria (InMemory), sin necesidad de configuración adicional.Bash# Acceder a la carpeta del proyecto API
-cd todo-app/backend/TodoApp.Api
+└── todo-front/
 
-# Restaurar dependencias
+yaml
+Copy code
+
+---
+
+## 3. Tecnologías utilizadas
+
+**Backend**
+- .NET 9 – ASP.NET Core Web API
+- Entity Framework Core 9 (InMemory)
+- JWT Authentication
+- Swashbuckle.AspNetCore 6.6.2 (Swagger)
+- xUnit (pruebas unitarias)
+
+**Frontend**
+- Angular 17 (Standalone Components)
+- Angular Material
+- RxJS / Observables
+- Karma + Jasmine (pruebas unitarias)
+- Lazy Loading y Guards
+
+---
+
+## 4. Instalación y ejecución
+
+### Backend (.NET 9)
+
+1. Abrir carpeta del backend:
+   ```bash
+   cd backend/TodoApp.Api
+Restaurar dependencias:
+
+bash
+Copy code
 dotnet restore
+Ejecutar el servidor:
 
-# Ejecutar el servidor. La API estará en http://localhost:5000/api
+bash
+Copy code
 dotnet run --urls=http://localhost:5000
-2. Frontend (Angular 17)Asegúrate de tener Node.js y Angular CLI instalados.Bash# Acceder a la carpeta del frontend
-cd todo-app/frontend/todo-front
+Acceder a la API:
 
-# Instalar dependencias
+bash
+Copy code
+http://localhost:5000/api
+Documentación Swagger:
+
+bash
+Copy code
+http://localhost:5000/swagger
+El backend utiliza una base de datos en memoria (UseInMemoryDatabase("TodoDb")).
+
+Frontend (Angular)
+Entrar al proyecto:
+
+bash
+Copy code
+cd frontend/todo-front
+Instalar dependencias:
+
+bash
+Copy code
 npm install
+Verificar la URL del backend en src/environments/environment.ts:
 
-# Verificar la configuración del entorno (apiBaseUrl: 'http://localhost:5000/api')
-# src/environments/environment.ts
+ts
+Copy code
+export const environment = {
+  production: false,
+  apiBaseUrl: 'http://localhost:5000/api'
+};
+Ejecutar la aplicación:
 
-# Ejecutar la aplicación en modo desarrollo. Se abrirá en el navegador.
+bash
+Copy code
 ng serve -o
-URL Local: http://localhost:4200Credenciales de PruebaUtiliza las siguientes credenciales para iniciar sesión después de ejecutar el proyecto:CampoValorEmailtest@todo.comPassword123456Funcionalidades Implementadas7.1 AutenticaciónLogin: Validación de credenciales y generación de Token JWT.Seguridad: Implementación de Guards para proteger rutas privadas.Intercepción: Un Interceptor que automáticamente adjunta el token JWT en el header de todas las peticiones a la API.7.2 Módulo de TareasCRUD Completo: Crear, listar, actualizar y eliminar tareas.Filtrado: Opciones para ver Todas, Completadas y Pendientes.Optimización: Uso de trackBy en listas para mejorar el rendimiento de Angular.7.3 DashboardVista de resumen con estadísticas clave:Tareas Totales Creadas.Tareas Completadas.Tareas Pendientes.Pruebas UnitariasBackend (xUnit)Proyecto: TodoApp.TestsSe utiliza UseInMemoryDatabase para simular un entorno de persistencia.Áreas cubiertas: TasksController y TokenService.Bash# Ejecutar pruebas del Backend
-cd todo-app/backend
+URL de desarrollo:
+http://localhost:4200
+
+5. Credenciales de prueba
+makefile
+Copy code
+email: test@todo.com
+password: 123456
+6. Funcionalidades
+Autenticación
+Inicio de sesión con correo y contraseña.
+
+Generación y validación de JWT.
+
+Guard para rutas protegidas.
+
+Interceptor que agrega el token automáticamente.
+
+Tareas
+Crear, listar, actualizar y eliminar tareas.
+
+Filtrar por estado: todas, completadas o pendientes.
+
+trackBy en listas (optimización).
+
+Notificaciones con MatSnackBar.
+
+Dashboard
+Métricas básicas:
+
+Total de tareas
+
+Completadas
+
+Pendientes
+
+7. Pruebas unitarias
+Backend
+Framework: xUnit
+
+Proyecto: TodoApp.Tests
+
+Base de datos simulada con UseInMemoryDatabase
+
+Pruebas sobre TasksController y TokenService
+
+Ejecutar:
+
+bash
+Copy code
+cd backend
 dotnet test
-Frontend (Karma + Jasmine)Áreas cubiertas: TaskService, TasksPageComponent, y AppComponent.Bash# Ejecutar pruebas del Frontend
-cd todo-app/frontend/todo-front
+Frontend
+Framework: Karma + Jasmine
+
+Pruebas incluidas:
+
+task.service.spec.ts
+
+tasks-page.component.spec.ts
+
+app.component.spec.ts
+
+Ejecutar:
+
+bash
+Copy code
+cd frontend/todo-front
 ng test
-Decisiones Técnicas ClaveDecisiónJustificaciónAngular StandaloneMaximiza la modularidad por feature sin depender de NgModules, aprovechando Angular 17.Servicios con ObservablesSe utilizó BehaviorSubject y Observables para un manejo de estado reactivo y centralizado, evitando la sobrecarga de dependencias de NgRx para un proyecto pequeño.Autenticación JWTEstándar de la industria para APIs RESTful sin estado, permitiendo la protección granular de endpoints.Interceptors (Frontend)Simplifican la lógica de red al centralizar el manejo de tokens y la notificación de errores globales (ej. snackbars).Validaciones BackendUso de Data Annotations y el atributo [ApiController] para obtener validación automática de modelos en los endpoints.Requisitos del Enunciado (Cumplimiento)RequisitoCumplimientoNotasAngular CLISíPrincipios de ModularizaciónSíStandalone Components por feature.NgRx o servicios observablesSíServicios basados en Observables (RxJS).Angular Material / ResponsiveSíLazy Loading y GuardsSíCarga perezosa de módulos.trackBy en listasSíPara optimización de rendimiento.Pruebas unitarias (front)Sí1 Servicio y 1 Componente.API RESTful (.NET 9)SíJWT AuthenticationSíEntity Framework CoreSíBase de datos InMemory.Validaciones en endpointsSíData Annotations.Pruebas unitarias (backend)SíTasksController y TokenService.Interceptor de tokensSíManejo de errores en clienteSíNotificaciones (snackbars).Swagger / LoggingNoOpcional, listado en Posibles Mejoras.Posibles Mejoras a ImplementarPersistencia Real: Migración de EF Core InMemory a SQL Server o PostgreSQL.Estado Global: Integración de NgRx para el manejo de estado más complejo.Documentación: Implementación de Swagger UI para la documentación automática de la API.DevOps: Configuración de Docker Compose para orquestar Backend y Frontend.Pruebas E2E: Adición de pruebas End-to-End (ej. con Cypress).AutorSteven RodríguezDesarrollador Full Stack (.NET & Angular) | Colombia
+8. Decisiones técnicas
+Standalone Components: modularización por features (auth, tasks, dashboard) sin NgModules tradicionales.
+
+Manejo de estado: servicios con BehaviorSubject y Observables.
+
+Validaciones: [Required], [EmailAddress] y [ApiController] para validación automática.
+
+Swagger: documentación de endpoints con JWT “Authorize”.
+
+Optimización: uso de trackBy, interceptores, y componentes reutilizables.
+

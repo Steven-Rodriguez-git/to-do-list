@@ -1,4 +1,4 @@
-¡Entendido! Aquí tienes el contenido completo del archivo README.md listo para copiar y pegar en un solo bloque de texto, sin emojis y utilizando Markdown para el formato:Markdown# Prueba Técnica Full Stack – To-Do List
+Prueba Técnica Full Stack – To-Do List
 ## .NET 9 (Backend) + Angular 17 (Frontend)
 
 Este repositorio contiene la solución completa para la prueba técnica Full Stack de gestión de tareas (To-Do List), implementando autenticación y persistencia temporal.

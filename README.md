@@ -1,231 +1,68 @@
-Prueba Técnica Full Stack – To-Do List (.NET 9 + Angular 17)
-1. Objetivo
+¡Entendido! Aquí tienes el contenido completo del archivo README.md listo para copiar y pegar en un solo bloque de texto, sin emojis y utilizando Markdown para el formato:Markdown# Prueba Técnica Full Stack – To-Do List
+## .NET 9 (Backend) + Angular 17 (Frontend)
 
-Desarrollar una aplicación To-Do List que permita la gestión de tareas con autenticación, utilizando .NET 9 para el backend y Angular 17 para el frontend.
-El propósito del ejercicio es evaluar la organización del código, buenas prácticas, modularización, manejo de estado, comunicación entre cliente y servidor, y cobertura de pruebas unitarias.
+Este repositorio contiene la solución completa para la prueba técnica Full Stack de gestión de tareas (To-Do List), implementando autenticación y persistencia temporal.
 
-2. Arquitectura general
+---
 
-El sistema está compuesto por dos aplicaciones separadas:
+## Objetivo del Proyecto
 
-Backend: API RESTful desarrollada en ASP.NET Core 9, con Entity Framework Core (InMemory), autenticación JWT, validación de datos mediante Data Annotations, y pruebas unitarias con xUnit.
+El propósito de este ejercicio es demostrar la capacidad de desarrollar una aplicación moderna, evaluando aspectos clave como:
 
-Frontend: Aplicación en Angular 17 estructurada con Standalone Components, Angular Material y Lazy Loading.
-Utiliza servicios observables para el manejo del estado, guards para protección de rutas, y interceptores para el manejo de tokens y errores.
+* Organización y modularización del código.
+* Buenas prácticas de desarrollo (patrones de diseño y separación de responsabilidades).
+* Manejo de estado y comunicación eficiente entre cliente y servidor.
+* Implementación de seguridad (JWT Authentication).
+* Cobertura básica de pruebas unitarias en ambos stacks.
 
-Diagrama general (lógico)
-[Angular App]
-    │
-    ▼
-[Interceptor JWT]──► [API .NET 9]
-                         │
-                         ▼
-                 [EF Core InMemory]
+---
 
-3. Tecnologías principales
+## Arquitectura General
 
-Backend
+El sistema está diseñado como un conjunto de dos aplicaciones separadas (Monorepo Lógico) para facilitar el desarrollo y la futura escalabilidad:
 
-.NET 9 – ASP.NET Core Web API
+| Componente | Stack Tecnológico | Descripción |
+| :--- | :--- | :--- |
+| **Backend** | **ASP.NET Core 9** (Web API) | Servidor API RESTful con autenticación JWT y persistencia temporal (EF Core InMemory). |
+| **Frontend** | **Angular 17** (Standalone) | Aplicación Single Page Application (SPA) con Angular Material, Lazy Loading y manejo de estado basado en Observables. |
 
-Entity Framework Core (InMemory)
+### Diagrama Lógico
 
-JWT (Json Web Token)
-
-xUnit (pruebas unitarias)
-
-Frontend
-
-Angular 17 (Standalone Components)
-
-Angular Material
-
-RxJS / Observables
-
-Karma + Jasmine (pruebas unitarias)
-
-Lazy Loading y Guards
-
-4. Estructura del proyecto
-todo-app/
+```mermaid
+graph TD
+    A[Angular App (Client)] -->|HTTP Request| B{Interceptor JWT};
+    B -->|Authorized| C[API .NET 9 (Backend)];
+    C --> D(EF Core InMemory);
+Tecnologías PrincipalesBackend (todo-app/backend)TecnologíaDescripción.NET 9ASP.NET Core Web API para servicios REST.Entity Framework CoreUtilizado con la base de datos InMemory para persistencia temporal.JWTImplementación de Json Web Token para el control de acceso y autenticación.xUnitFramework de pruebas unitarias.Frontend (todo-app/frontend/todo-front)TecnologíaDescripciónAngular 17Uso de Standalone Components y arquitectura moderna de Angular.Angular MaterialComponentes y diseño para una interfaz limpia y responsiva.RxJS / ObservablesManejo de estado centralizado a través de servicios reactivos.GuardsProtección de rutas.Estructura del Proyectotodo-app/
 ├── backend/
 │   ├── backend.sln
-│   ├── TodoApp.Api/
-│   └── TodoApp.Tests/
+│   ├── TodoApp.Api/             # Proyecto principal de la API .NET 9
+│   └── TodoApp.Tests/           # Proyecto de pruebas unitarias (xUnit)
 └── frontend/
-    └── todo-front/
+    └── todo-front/              # Proyecto Angular 17
+Instalación y Ejecución1. Backend (.NET 9)El backend utiliza una base de datos en memoria (InMemory), sin necesidad de configuración adicional.Bash# Acceder a la carpeta del proyecto API
+cd todo-app/backend/TodoApp.Api
 
-5. Instalación y ejecución
-5.1 Backend (.NET 9)
-
-Acceder al proyecto:
-
-cd backend/TodoApp.Api
-
-
-Restaurar dependencias:
-
+# Restaurar dependencias
 dotnet restore
 
-
-Ejecutar el servidor:
-
+# Ejecutar el servidor. La API estará en http://localhost:5000/api
 dotnet run --urls=http://localhost:5000
+2. Frontend (Angular 17)Asegúrate de tener Node.js y Angular CLI instalados.Bash# Acceder a la carpeta del frontend
+cd todo-app/frontend/todo-front
 
-
-La API quedará disponible en:
-
-http://localhost:5000/api
-
-
-El backend utiliza una base de datos en memoria (InMemory), sin necesidad de configuración adicional.
-
-5.2 Frontend (Angular)
-
-Acceder al proyecto:
-
-cd frontend/todo-front
-
-
-Instalar dependencias:
-
+# Instalar dependencias
 npm install
 
+# Verificar la configuración del entorno (apiBaseUrl: 'http://localhost:5000/api')
+# src/environments/environment.ts
 
-Verificar la configuración del entorno (src/environments/environment.ts):
-
-export const environment = {
-  production: false,
-  apiBaseUrl: 'http://localhost:5000/api'
-};
-
-
-Ejecutar la aplicación:
-
+# Ejecutar la aplicación en modo desarrollo. Se abrirá en el navegador.
 ng serve -o
-
-
-URL local: http://localhost:4200
-
-6. Credenciales de prueba
-email: test@todo.com
-password: 123456
-
-7. Funcionalidades implementadas
-7.1 Autenticación
-
-Login mediante correo y contraseña.
-
-Generación de token JWT.
-
-Guard de rutas protegidas.
-
-Interceptor que agrega el token en cada petición HTTP.
-
-7.2 Módulo de tareas
-
-Crear, listar, actualizar y eliminar tareas.
-
-Filtrado por estado: todas, completadas, pendientes.
-
-Optimización de listas mediante trackBy.
-
-Persistencia temporal con EF Core InMemory.
-
-7.3 Dashboard
-
-Muestra resumen de tareas:
-
-Total creadas.
-
-Completadas.
-
-Pendientes.
-
-8. Pruebas unitarias
-Backend
-
-Proyecto: TodoApp.Tests
-
-Framework: xUnit
-
-Base de datos simulada con UseInMemoryDatabase.
-
-Pruebas implementadas para:
-
-TasksController
-
-TokenService
-
-Ejecutar:
-
-cd backend
+URL Local: http://localhost:4200Credenciales de PruebaUtiliza las siguientes credenciales para iniciar sesión después de ejecutar el proyecto:CampoValorEmailtest@todo.comPassword123456Funcionalidades Implementadas7.1 AutenticaciónLogin: Validación de credenciales y generación de Token JWT.Seguridad: Implementación de Guards para proteger rutas privadas.Intercepción: Un Interceptor que automáticamente adjunta el token JWT en el header de todas las peticiones a la API.7.2 Módulo de TareasCRUD Completo: Crear, listar, actualizar y eliminar tareas.Filtrado: Opciones para ver Todas, Completadas y Pendientes.Optimización: Uso de trackBy en listas para mejorar el rendimiento de Angular.7.3 DashboardVista de resumen con estadísticas clave:Tareas Totales Creadas.Tareas Completadas.Tareas Pendientes.Pruebas UnitariasBackend (xUnit)Proyecto: TodoApp.TestsSe utiliza UseInMemoryDatabase para simular un entorno de persistencia.Áreas cubiertas: TasksController y TokenService.Bash# Ejecutar pruebas del Backend
+cd todo-app/backend
 dotnet test
-
-Frontend
-
-Framework: Karma + Jasmine
-
-Pruebas implementadas para:
-
-TaskService
-
-TasksPageComponent
-
-AppComponent
-
-Ejecutar:
-
-cd frontend/todo-front
+Frontend (Karma + Jasmine)Áreas cubiertas: TaskService, TasksPageComponent, y AppComponent.Bash# Ejecutar pruebas del Frontend
+cd todo-app/frontend/todo-front
 ng test
-
-9. Decisiones técnicas
-
-Arquitectura Angular Standalone: se optó por componentes standalone (Angular 17) en lugar de NgModules tradicionales, manteniendo modularización por features (auth, tasks, dashboard) y carga perezosa (loadComponent).
-
-Manejo de estado: los servicios usan BehaviorSubject y Observables, evitando dependencias adicionales como NgRx.
-
-Validación del backend: se implementaron Data Annotations ([Required], [EmailAddress]) y [ApiController] para validación automática.
-
-Autenticación: el login devuelve un JWT que se utiliza en el resto de endpoints protegidos.
-
-Optimización: uso de trackBy, servicios centralizados y componentes reactivos.
-
-Interceptors: se agregaron para JWT y manejo global de errores (snackbars de notificación).
-
-10. Requisitos del enunciado
-Requisito	Implementación
-Angular CLI	Sí
-Principios de modularización	Sí (Standalone por features)
-NgRx o servicios observables	Sí (servicios observables)
-Angular Material / responsive	Sí
-Lazy Loading	Sí
-trackBy en listas	Sí
-Pruebas unitarias (front)	Sí (1 servicio y 1 componente)
-API RESTful (.NET 9)	Sí
-JWT Authentication	Sí
-Entity Framework Core	Sí (InMemory)
-Validaciones en endpoints	Sí
-Pruebas unitarias (backend)	Sí
-Interceptor de tokens	Sí
-Manejo de errores en cliente	Sí
-Swagger / Logging	No (opcional)
-11. Posibles mejoras
-
-Persistencia con base de datos real (SQL Server o PostgreSQL).
-
-Manejo de estado global con NgRx.
-
-Documentación automática con Swagger UI.
-
-Logging centralizado (Serilog / NLog).
-
-Docker Compose (backend + frontend).
-
-Pruebas end-to-end (Cypress).
-
-12. Autor
-
-Steven Rodríguez
-Desarrollador .NET & Angular
-Colombia
+Decisiones Técnicas ClaveDecisiónJustificaciónAngular StandaloneMaximiza la modularidad por feature sin depender de NgModules, aprovechando Angular 17.Servicios con ObservablesSe utilizó BehaviorSubject y Observables para un manejo de estado reactivo y centralizado, evitando la sobrecarga de dependencias de NgRx para un proyecto pequeño.Autenticación JWTEstándar de la industria para APIs RESTful sin estado, permitiendo la protección granular de endpoints.Interceptors (Frontend)Simplifican la lógica de red al centralizar el manejo de tokens y la notificación de errores globales (ej. snackbars).Validaciones BackendUso de Data Annotations y el atributo [ApiController] para obtener validación automática de modelos en los endpoints.Requisitos del Enunciado (Cumplimiento)RequisitoCumplimientoNotasAngular CLISíPrincipios de ModularizaciónSíStandalone Components por feature.NgRx o servicios observablesSíServicios basados en Observables (RxJS).Angular Material / ResponsiveSíLazy Loading y GuardsSíCarga perezosa de módulos.trackBy en listasSíPara optimización de rendimiento.Pruebas unitarias (front)Sí1 Servicio y 1 Componente.API RESTful (.NET 9)SíJWT AuthenticationSíEntity Framework CoreSíBase de datos InMemory.Validaciones en endpointsSíData Annotations.Pruebas unitarias (backend)SíTasksController y TokenService.Interceptor de tokensSíManejo de errores en clienteSíNotificaciones (snackbars).Swagger / LoggingNoOpcional, listado en Posibles Mejoras.Posibles Mejoras a ImplementarPersistencia Real: Migración de EF Core InMemory a SQL Server o PostgreSQL.Estado Global: Integración de NgRx para el manejo de estado más complejo.Documentación: Implementación de Swagger UI para la documentación automática de la API.DevOps: Configuración de Docker Compose para orquestar Backend y Frontend.Pruebas E2E: Adición de pruebas End-to-End (ej. con Cypress).AutorSteven RodríguezDesarrollador Full Stack (.NET & Angular) | Colombia

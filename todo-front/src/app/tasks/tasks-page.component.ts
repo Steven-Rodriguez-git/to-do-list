@@ -9,9 +9,10 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { TaskService, TodoTask } from '../core/services/task.service';
+import { NotificationService } from '../core/services/notification.service';
 
 @Component({
   standalone: true,
@@ -32,7 +33,6 @@ import { TaskService, TodoTask } from '../core/services/task.service';
   template: `
     <mat-card>
       <div class="row">
-        <!-- Filtro: mat-select dentro de mat-form-field -->
         <mat-form-field appearance="outline">
           <mat-label>Filtrar</mat-label>
           <mat-select
@@ -47,7 +47,6 @@ import { TaskService, TodoTask } from '../core/services/task.service';
 
         <span class="spacer"></span>
 
-        <!-- Form crear -->
         <form
           (ngSubmit)="create(newTitle.value); newTitle.value = ''"
           class="row"
@@ -64,13 +63,56 @@ import { TaskService, TodoTask } from '../core/services/task.service';
 
       <ul *ngIf="!loading">
         <li *ngFor="let t of tasks; trackBy: trackById" class="item">
-          <mat-checkbox
-            [checked]="t.isCompleted"
-            (change)="toggleComplete(t)"
-          ></mat-checkbox>
-          <span [class.done]="t.isCompleted">{{ t.title }}</span>
+          <mat-checkbox [checked]="t.isCompleted" (change)="toggleComplete(t)">
+          </mat-checkbox>
+
+          <!-- Vista normal -->
+          <ng-container *ngIf="editingId !== t.id; else editTpl">
+            <span
+              class="title"
+              [class.done]="t.isCompleted"
+              (dblclick)="startEdit(t)"
+            >
+              {{ t.title }}
+            </span>
+            <button mat-icon-button (click)="startEdit(t)" aria-label="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </ng-container>
+
+          <!-- Modo edición -->
+          <ng-template #editTpl>
+          <input
+  class="inline-input"
+  [(ngModel)]="editTitle"
+  autofocus
+  (keydown.enter)="confirmEdit(t)"
+  (keydown.escape)="cancelEdit()"
+/>
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="confirmEdit(t)"
+              aria-label="Guardar"
+            >
+              <mat-icon>check</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              (click)="cancelEdit()"
+              aria-label="Cancelar"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </ng-template>
+
           <span class="spacer"></span>
-          <button mat-icon-button color="warn" (click)="remove(t)">
+          <button
+            mat-icon-button
+            color="warn"
+            (click)="remove(t)"
+            aria-label="Eliminar"
+          >
             <mat-icon>delete</mat-icon>
           </button>
         </li>
@@ -83,6 +125,7 @@ import { TaskService, TodoTask } from '../core/services/task.service';
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-wrap: wrap;
       }
       .spacer {
         flex: 1 1 auto;
@@ -98,6 +141,7 @@ import { TaskService, TodoTask } from '../core/services/task.service';
         gap: 8px;
         padding: 8px 0;
         border-bottom: 1px solid #eee;
+        flex-wrap: wrap;
       }
       .done {
         text-decoration: line-through;
@@ -105,6 +149,26 @@ import { TaskService, TodoTask } from '../core/services/task.service';
       }
       .w-100 {
         width: 100%;
+      }
+      .title {
+        cursor: pointer;
+        user-select: none;
+      }
+      .inline-input {
+        font: inherit;
+        padding: 6px 8px;
+        width: 240px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        outline: none;
+      }
+      .inline-input:focus {
+        border-color: #3f51b5;
+      }
+      mat-card {
+        margin: 16px auto;
+        max-width: 800px;
+        display: block;
       }
     `,
   ],
@@ -114,7 +178,10 @@ export class TasksPageComponent implements OnInit {
   status = signal<'all' | 'completed' | 'pending'>('all');
   loading = false;
 
-  constructor(private api: TaskService, private snack: MatSnackBar) {}
+  editingId: number | null = null;
+  editTitle = '';
+
+  constructor(private api: TaskService, private notify: NotificationService) {}
 
   ngOnInit() {
     this.load();
@@ -128,7 +195,7 @@ export class TasksPageComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.snack.open('Error cargando tareas', 'OK', { duration: 2000 });
+        this.notify.error('Error cargando tareas');
         this.loading = false;
       },
     });
@@ -141,10 +208,9 @@ export class TasksPageComponent implements OnInit {
     this.api.updateTask(t.id, updated).subscribe({
       next: () => {
         t.isCompleted = !t.isCompleted;
-        this.snack.open('Actualizada', 'OK', { duration: 1200 });
+        this.notify.success('Tarea actualizada');
       },
-      error: () =>
-        this.snack.open('Error actualizando', 'OK', { duration: 2000 }),
+      error: () => this.notify.error('Error actualizando tarea'),
     });
   }
 
@@ -152,22 +218,62 @@ export class TasksPageComponent implements OnInit {
     this.api.deleteTask(t.id).subscribe({
       next: () => {
         this.tasks = this.tasks.filter((x) => x.id !== t.id);
-        this.snack.open('Eliminada', 'OK', { duration: 1200 });
+        this.notify.success('Tarea eliminada');
       },
-      error: () =>
-        this.snack.open('Error eliminando', 'OK', { duration: 2000 }),
+      error: () => this.notify.error('Error eliminando tarea'),
     });
   }
 
   create(title: string) {
-    if (!title?.trim()) return;
-    const dto = { title, description: '', isCompleted: false, dueDate: null };
+    const clean = title?.trim();
+    if (!clean) {
+      this.notify.info('El título no puede estar vacío');
+      return;
+    }
+
+    const dto = {
+      title: clean,
+      description: '',
+      isCompleted: false,
+      dueDate: null,
+    };
     this.api.createTask(dto).subscribe({
       next: (created) => {
         this.tasks = [created, ...this.tasks];
-        this.snack.open('Creada', 'OK', { duration: 1200 });
+        this.notify.success('Tarea creada');
       },
-      error: () => this.snack.open('Error creando', 'OK', { duration: 2000 }),
+      error: () => this.notify.error('Error creando tarea'),
+    });
+  }
+
+  startEdit(t: TodoTask) {
+    this.editingId = t.id;
+    this.editTitle = t.title;
+  }
+
+  cancelEdit() {
+    this.editingId = null;
+    this.editTitle = '';
+  }
+
+  confirmEdit(t: TodoTask) {
+    const newTitle = this.editTitle.trim();
+    if (!newTitle) {
+      this.notify.info('El título no puede estar vacío');
+      return;
+    }
+    if (newTitle === t.title) {
+      this.cancelEdit();
+      return;
+    }
+
+    this.api.updateTask(t.id, { ...t, title: newTitle }).subscribe({
+      next: () => {
+        t.title = newTitle;
+        this.cancelEdit();
+        this.notify.success('Título actualizado');
+      },
+      error: () => this.notify.error('Error actualizando título'),
     });
   }
 }

@@ -28,11 +28,6 @@ El sistema está diseñado como un conjunto de dos aplicaciones separadas (Monor
 
 ### Diagrama Lógico
 
-```mermaid
-graph TD
-    A[Angular App (Client)] -->|HTTP Request| B{Interceptor JWT};
-    B -->|Authorized| C[API .NET 9 (Backend)];
-    C --> D(EF Core InMemory);
 Tecnologías PrincipalesBackend (todo-app/backend)TecnologíaDescripción.NET 9ASP.NET Core Web API para servicios REST.Entity Framework CoreUtilizado con la base de datos InMemory para persistencia temporal.JWTImplementación de Json Web Token para el control de acceso y autenticación.xUnitFramework de pruebas unitarias.Frontend (todo-app/frontend/todo-front)TecnologíaDescripciónAngular 17Uso de Standalone Components y arquitectura moderna de Angular.Angular MaterialComponentes y diseño para una interfaz limpia y responsiva.RxJS / ObservablesManejo de estado centralizado a través de servicios reactivos.GuardsProtección de rutas.Estructura del Proyectotodo-app/
 ├── backend/
 │   ├── backend.sln

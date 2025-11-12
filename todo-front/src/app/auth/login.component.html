@@ -1,0 +1,17 @@
+<mat-card>
+  <h2>Iniciar sesión</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+   <mat-form-field appearance="outline" class="w-100">
+  <mat-label>Email</mat-label>
+  <input matInput formControlName="email" type="email" />
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="w-100">
+  <mat-label>Contraseña</mat-label>
+  <input matInput formControlName="password" type="password" />
+</mat-form-field>
+
+
+    <button mat-raised-button color="primary" [disabled]="form.invalid || loading">Entrar</button>
+  </form>
+</mat-card>
